@@ -1,42 +1,25 @@
 class Hermite {
 
-    function interpolate(t, points, tangents, knots, derivative, result) {
+    constructor() {
+
+    }
+
+    interpolate(t, points, knots, derivative, result) {
 
         var n = points.length;    // number or points / tangents / knots
-        var d = points[0].length; // vector dimensionality
-        var v = result || new Array(d); // destination vector
+        var d = 2; // vector dimensionality
+        var v = createVector(0, 0); // destination vector
 
-        if(knots) {
-            // find knot interval for t
-            for(var i=0; i<n-1; i++) {
-                if(t >= knots[i] && t <= knots[i+1]) {
-                    break;
-                }
-            }
+        var t = t * (n - 1); // rescale t to [0, n-1]
+        var i0 = t|0;        // truncate
+        var i1 = i0 + 1;
 
-            if(i === n-1) throw new Error('out of bounds');
+        if(i0 > n-1) throw new Error('out of bounds');
+        if(i0 === n-1) i1 = i0;
 
-            var i0 = i;
-            var i1 = i + 1;
-            var k0 = knots[i0];
-            var k1 = knots[i1];
-            var scale = k1 - k0;
+        var scale = i1 - i0;
 
-            t = (t - k0) / scale;
-
-        } else {
-
-            var t = t * (n - 1); // rescale t to [0, n-1]
-            var i0 = t|0;        // truncate
-            var i1 = i0 + 1;
-
-            if(i0 > n-1) throw new Error('out of bounds');
-            if(i0 === n-1) i1 = i0;
-
-            var scale = i1 - i0;
-
-            t = (t - i0) / scale;
-        }
+        t = (t - i0) / scale;
 
         if(derivative) {
             var t2 = t * t;
@@ -55,12 +38,16 @@ class Hermite {
             var h11 = t2 * (t - 1);
         }
 
-        for(var i=0; i<d; i++) {
-            v[i] = h00 * points[i0][i] +
-                h10 * tangents[i0][i] * scale +
-                h01 * points[i1][i] +
-                h11 * tangents[i1][i] * scale;
-        }
+
+        v.x = h00 * points[i0].pos.x +
+            h10 * points[i0].real_tangent().x * scale +
+            h01 * points[i1].pos.x +
+            h11 * points[i1].real_tangent().x * scale;
+
+        v.y = h00 * points[i0].pos.y +
+            h10 * points[i0].real_tangent().y * scale +
+            h01 * points[i1].pos.y +
+            h11 * points[i1].real_tangent().y * scale;
 
         return v;
     }

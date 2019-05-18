@@ -1,56 +1,87 @@
 
 let points = [];
 
+let selectedPoint = null;
+
+const hermite = new Hermite();
+
 function setup() {
 	createCanvas(windowWidth, windowHeight);
 	fill(255);
+	noStroke();
 }
 
 function draw() {
 	background(0);
-	// var points = [
-	// 	[ 0, 		height/2],
-	// 	[ middleX,  middleY],
-	// 	[ width, 	height/2]
-	// ];
-	//
-	// var tangents = [
-	// 	[1, -1000],
-	// 	[0, 0],
-	// 	[1, -1000]
-	// ];
-	//
-	// fill(255, 0, 0);
-	// for (let i = 0; i < points.length; i++) {
-	// 	let point = points[i];
-	// 	ellipse(normalizeX(point[0]), normalizeY(point[1]), 10, 10);
-	// }
-	//
-	// fill(255);
-	// for(var t=0; t<1; t+=0.01) {
-	// 	var point = interpolate(t, points, tangents);
-	// 	ellipse(normalizeX(point[0]), normalizeY(point[1]), 5, 5);
-	// 	// var tangent = interpolate(t, points, tangents, null, true);
-	//
-	// 	// stroke(0, 255, 0);
-	// 	// line(point[0], point[1], tangent[0], tangent[1]);
-	// }
+
+	fill(255);
+
+	if (points.length > 0) {
+		let last = points[0].pos;
+		for(var t=0; t<1; t+=0.001) {
+			var pt = hermite.interpolate(t, points);
+
+			// ellipse(pt.x, pt.y, 5, 5);
+			stroke(255);
+			strokeWeight(3);
+			line(last.x, last.y, pt.x, pt.y);
+
+			last = pt;
+
+			// var tangent = hermite.interpolate(t, points, null, true);
+			//
+			// stroke(255, 50);
+			// strokeWeight(2);
+			// line(pt.x, pt.y, pt.x - tangent.x, pt.y - tangent.y);
+		}
+	}
+
+
+	for (let pt of points) {
+		pt.draw();
+	}
+
 }
 
-function keyPressed() {
-	points.append(new Point());
+function pointInPosition(x, y) {
+	for (let point of points) {
+		if (point.isInside(x, y)) {
+			return point;
+		} else {
+			if (point.tangent.isInside(x, y)) {
+				return point.tangent;
+			}
+		}
+	}
+
+	return null;
+}
+
+function mousePressed() {
+	if (selectedPoint) {
+		selectedPoint.selected = false;
+	}
+
+	selectedPoint = pointInPosition(mouseX, mouseY);
+
+	if (selectedPoint) {
+		selectedPoint.selected = true;
+	} else {
+		points.push(new Point(mouseX, mouseY));
+	}
+}
+
+function mouseReleased() {
+	if (selectedPoint) {
+		selectedPoint.selected = false;
+		selectedPoint = null;
+	}
 }
 
 function mouseDragged() {
-	middleX = mouseX;
-	middleY = mouseY;
+	if (selectedPoint) {
+		selectedPoint.move(mouseX, mouseY);
+	}
 }
 
-function normalizeX(x) {
-	return x; //map(x, -1, 1, 0, width);
-}
-
-function normalizeY(y) {
-	return y; //map(y, -1, 1, 0, height);
-}
 
