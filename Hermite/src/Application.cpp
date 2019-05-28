@@ -3,7 +3,7 @@
 //
 
 #include "../include/Application.hpp"
-#include "../build/Hermite.h"
+#include "../include/Hermite.h"
 
 
 Application::Application(MAP_TYPE _x, MAP_TYPE _y) :
@@ -17,9 +17,8 @@ void Application::Start() {
 	ShapesManager::getInstance()->ptrWindow = ptrWindow;
 	ShapesManager::getInstance()->ptrCircleShape = new sf::CircleShape();
 
-	Hermite hermite;
+	Hermite* hermite = new Hermite();
 
-	points.push_back(new Point(500, 500));
 
 	sf::Clock clock;
 
@@ -31,6 +30,15 @@ void Application::Start() {
 
 	sf::Vector2i point;
 
+	auto firstPoint = new Point(500, 500);
+
+	firstPoint->showPrimaryTangent = false;
+	firstPoint->showSecondaryTangent = false;
+
+	lastCreatedPoint = firstPoint;
+
+	points.push_back(firstPoint);
+
     while (this->ptrWindow->isOpen())
     {
         sf::Event event;
@@ -40,8 +48,8 @@ void Application::Start() {
 				this->ptrWindow->close();
 		}
 
-		// float ElapsedTime = clock.getElapsedTime().asSeconds();
-		// clock.restart();
+		float ElapsedTime = clock.getElapsedTime().asSeconds();
+		clock.restart();
 
 		sf::Vector2i position = sf::Mouse::getPosition(*ptrWindow);
 
@@ -84,19 +92,39 @@ void Application::Start() {
 		if (points.size() > 1) {
 			last = sf::Vector2i(points.at(0)->x, points.at(0)->y);
 
-			for (double i = 0; i < 1; i += 0.001) {
-				hermite.Interpolate(i, points, &point);
+			if (tangentForEach) {
+				for (int pair = 0; pair < points.size() - 1; pair++) {
+					for (double i = 0; i < 1; i += 0.01) {
+						auto pointA = points.at(pair);
+						auto pointB = points.at(pair + 1);
 
-				sf::Vertex line[] =
-				{
-					sf::Vertex(sf::Vector2f(last.x, last.y)),
-					sf::Vertex(sf::Vector2f(point.x, point.y))
-				};
+						hermite->PairInterpolate(i, pointA, pointB, pointA->NormalizedTangent(),  pointB->NormalizedTangentSecondary(), &point);
 
-				last = point;
+						sf::Vertex line[] =
+						{
+							sf::Vertex(sf::Vector2f(last.x, last.y)),
+							sf::Vertex(sf::Vector2f(point.x, point.y))
+						};
 
-				ShapesManager::getInstance()->ptrWindow->draw(line, 2, sf::Lines);
+						last = point;
 
+						ShapesManager::getInstance()->ptrWindow->draw(line, 2, sf::Lines);
+					}
+				}
+			} else {
+				for (double i = 0; i < 1; i += 0.0001) {
+					hermite->Interpolate(i, points, &point);
+
+					sf::Vertex line[] =
+					{
+						sf::Vertex(sf::Vector2f(last.x, last.y)),
+						sf::Vertex(sf::Vector2f(point.x, point.y))
+					};
+
+					last = point;
+
+					ShapesManager::getInstance()->ptrWindow->draw(line, 2, sf::Lines);
+				}
 			}
 		}
 
@@ -108,11 +136,9 @@ void Application::Start() {
 
 		this->ptrWindow->display();
 
-		// printf("Frame took %5lf\n", ElapsedTime);
-    }
+		printf("Frame took %5lfs\n", ElapsedTime);
+  }
 }
-
-
 
 void Application::ProcessLoop() {
 
@@ -120,7 +146,17 @@ void Application::ProcessLoop() {
 
 void Application::OnRightMouseClicked(sf::Vector2i position)
 {
-	points.push_back(new Point(position.x, position.y));
+	auto newPoint = new Point(position.x, position.y);
+	points.push_back(newPoint);
+
+	lastCreatedPoint->showPrimaryTangent = true;
+
+	lastCreatedPoint = newPoint;
+
+	if (tangentForEach){
+		lastCreatedPoint->showSecondaryTangent = true;
+  	lastCreatedPoint->showPrimaryTangent = false;
+  }
 }
 
 void Application::OnLeftMouseClicked(sf::Vector2i position)
@@ -169,6 +205,9 @@ Entity* Application::EntityInMousePosition(int x, int y)
 		}
 		if (point->ptrTangent->IsInside(x, y)) {
 			return point->ptrTangent;
+		}
+		if (point->ptrTangentSecondary->IsInside(x, y) && tangentForEach) {
+			return point->ptrTangentSecondary;
 		}
 	}
 

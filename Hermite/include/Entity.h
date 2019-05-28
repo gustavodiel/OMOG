@@ -30,7 +30,7 @@ public:
 	virtual void Move(int dX, int dY) {
 		this->x += dX;
 		this->y += dY;
-	}	
+	}
 
 	bool IsInside(int x, int y) {
 		return this->Distance(x, y) < this->radius;

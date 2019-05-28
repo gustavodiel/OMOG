@@ -7,11 +7,13 @@
 
 #include <SFML/Graphics.hpp>
 #include "Defines.hpp"
-#include "../build/Point.h"
-#include "../build/Entity.h"
+#include "../include/Point.h"
+#include "../include/Entity.h"
 
 class Application {
 public:
+
+		bool tangentForEach = false;
 
     MAP_TYPE windowX, windowY;
 
@@ -22,6 +24,8 @@ public:
 private:
 
     sf::RenderWindow        *ptrWindow;
+
+		Point* lastCreatedPoint;
 
     void ProcessLoop();
 
