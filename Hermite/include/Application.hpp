@@ -9,23 +9,24 @@
 #include "Defines.hpp"
 #include "../include/Point.h"
 #include "../include/Entity.h"
+#include  "../include/Hermite.h"
 
 class Application {
-public:
-
-		bool tangentForEach = false;
-
+public:	
     MAP_TYPE windowX, windowY;
 
     Application(MAP_TYPE _x, MAP_TYPE _y);
 
     void Start();
 
+	Hermite* hermite = new Hermite();
+
 private:
+	sf::RenderWindow        *ptrWindow;
 
-    sf::RenderWindow        *ptrWindow;
-
-		Point* lastCreatedPoint;
+	sf::Text text;
+	bool isHermite = true;
+	bool disableSpace = false;
 
     void ProcessLoop();
 
@@ -39,11 +40,12 @@ private:
 	void OnLeftMouseDragged(sf::Vector2i position);
 
 	Entity* EntityInMousePosition(int x, int y);
-
-	std::vector<Point*> points;
-
-	Entity* selectedEntity = NULL;
-
+public:
+	void OnSpacePressed();
+	void OnSpaceHold();
+	void OnSpaceReleased();
+	void OnEnterPressed();
+	void OnEnterReleased();
 };
 
 
