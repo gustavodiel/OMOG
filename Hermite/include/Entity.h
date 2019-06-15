@@ -7,11 +7,13 @@
 #include "SFML/Graphics.hpp"
 #include "ShapesManager.h"
 
+#define TYPE double
+
 class Entity
 {
 public:
-	int x;
-	int y;
+	TYPE x;
+	TYPE y;
 
 	int radius = 25;
 
@@ -19,26 +21,26 @@ public:
 
 	sf::Color color, selectedColor;
 
-	Entity(int x, int y) : x(x), y(y), selected(false) {}
+	Entity(TYPE x, TYPE y) : x(x), y(y), selected(false) {}
 	~Entity() {}
 
-	virtual void MoveTo(int x, int y) {
+	virtual void MoveTo(TYPE x, TYPE y) {
 		this->x = x;
 		this->y = y;
 	}
 
-	virtual void Move(int dX, int dY) {
+	virtual void Move(TYPE dX, TYPE dY) {
 		this->x += dX;
 		this->y += dY;
 	}
 
-	bool IsInside(int x, int y) {
+	bool IsInside(TYPE x, TYPE y) {
 		return this->Distance(x, y) < this->radius;
 	}
 
-	float Distance(int x, int y) {
-		int xx = (x - this->x) * (x - this->x);
-		int yy = (y - this->y) * (y - this->y);
+	float Distance(TYPE x, TYPE y) {
+		TYPE xx = (x - this->x) * (x - this->x);
+		TYPE yy = (y - this->y) * (y - this->y);
 
 		return sqrt(xx + yy);
 	}

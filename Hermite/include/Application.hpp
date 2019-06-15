@@ -10,8 +10,19 @@
 #include "../include/Point.h"
 #include "../include/Entity.h"
 #include  "../include/Hermite.h"
+#include "../include/NURBS.h"
 
 class Application {
+private:
+	typedef enum
+	{
+		DRAWING_HERMITE,
+		DRAWING_NURBS,
+		ANIMATION,
+		STOPPED
+	} States;
+
+
 public:	
     MAP_TYPE windowX, windowY;
 
@@ -19,14 +30,34 @@ public:
 
     void Start();
 
+	void HandleInput();
+
 	Hermite* hermite = new Hermite();
+	NURBS*   nurbs   = new NURBS();
 
 private:
 	sf::RenderWindow        *ptrWindow;
 
+
+	sf::Clock clock;
+
+	sf::Font font;
+
 	sf::Text text;
-	bool isHermite = true;
+	sf::Text pressPToHidePoints;
+	sf::Text pressSpaceToToggle;
+	sf::Text pressEnterToJoin;
+
+
 	bool disableSpace = false;
+
+	States state = DRAWING_HERMITE;
+
+	bool justRightClicked = false;
+	bool justLeftClicked = false;
+	bool spacePressed = false;
+	bool enterPressed = false;
+	bool pPressed = false;
 
     void ProcessLoop();
 
@@ -39,13 +70,23 @@ private:
 	void OnRightMouseDragged(sf::Vector2i position);
 	void OnLeftMouseDragged(sf::Vector2i position);
 
-	Entity* EntityInMousePosition(int x, int y);
+	bool LockedForInteract() {
+		return state == STOPPED || state == ANIMATION;
+	}
+
 public:
 	void OnSpacePressed();
 	void OnSpaceHold();
 	void OnSpaceReleased();
+
+	void SetDrawingNurbs();
+
+	void SetDrawingHermite();
+
 	void OnEnterPressed();
 	void OnEnterReleased();
+	void OnPPressed();
+	void OnPReleased();
 };
 
 

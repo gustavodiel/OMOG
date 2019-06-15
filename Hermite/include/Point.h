@@ -11,11 +11,11 @@ public:
 	bool showPrimaryTangent = true;
 	bool showSecondaryTangent = false;
 
-	Point(int x, int y);
+	Point(double x, double y);
 	~Point();
 
-	void MoveTo(int x, int y);
-	void Move(int dX, int dY);
+	void MoveTo(double x, double y);
+	void Move(double dX, double dY);
 
 	void Draw();
 

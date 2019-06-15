@@ -1,7 +1,5 @@
 #include "../include/Hermite.h"
 
-
-
 Hermite::Hermite()
 {
 	auto firstPoint = new Point(500, 500);
@@ -20,12 +18,14 @@ Hermite::~Hermite()
 }
 
 void Hermite::Draw() {
-	for (auto point : this->points) {
-		point->Draw();
+	if (!this->hidePoints) {
+		for (auto point : this->points) {
+			point->Draw();
+		}
 	}
 }
 
-void Hermite::OnRightMouseClicked(sf::Vector2i position)
+bool Hermite::OnRightMouseClicked(sf::Vector2i position)
 {
 	auto newPoint = new Point(position.x, position.y);
 
@@ -39,9 +39,11 @@ void Hermite::OnRightMouseClicked(sf::Vector2i position)
 		this->lastCreatedPoint->showSecondaryTangent = true;
 		this->lastCreatedPoint->showPrimaryTangent = false;
 	}
+
+	return true;
 }
 
-void Hermite::OnLeftMouseClicked(sf::Vector2i position)
+bool Hermite::OnLeftMouseClicked(sf::Vector2i position)
 {
 	if (selectedEntity != NULL) {
 		selectedEntity->selected = false;
@@ -51,30 +53,37 @@ void Hermite::OnLeftMouseClicked(sf::Vector2i position)
 
 	if (selectedEntity != NULL) {
 		selectedEntity->selected = true;
+		return true;
 	}
+	return false;
 }
 
-void Hermite::OnRightMouseReleased(sf::Vector2i position)
+bool Hermite::OnRightMouseReleased(sf::Vector2i position)
 {
+	return false;
 }
 
-void Hermite::OnLeftMouseReleased(sf::Vector2i position)
+bool Hermite::OnLeftMouseReleased(sf::Vector2i position)
 {
 	if (selectedEntity != NULL) {
 		selectedEntity->selected = false;
 		selectedEntity = NULL;
 	}
+	return false;
 }
 
-void Hermite::OnRightMouseDragged(sf::Vector2i position)
+bool Hermite::OnRightMouseDragged(sf::Vector2i position)
 {
+	return false;
 }
 
-void Hermite::OnLeftMouseDragged(sf::Vector2i position)
+bool Hermite::OnLeftMouseDragged(sf::Vector2i position)
 {
 	if (selectedEntity != NULL) {
 		selectedEntity->MoveTo(position.x, position.y);
+		return true;
 	}
+	return false;
 }
 
 Entity* Hermite::EntityInMousePosition(int x, int y)
@@ -94,8 +103,23 @@ Entity* Hermite::EntityInMousePosition(int x, int y)
 	return NULL;
 }
 
+Point* Hermite::FirstPoint()
+{
+	return this->points.at(0);
+}
+
+void Hermite::ToggleHidePoints()
+{
+	this->hidePoints = !this->hidePoints;
+}
+
+bool Hermite::IsReady()
+{
+	return this->points.size() > 1;
+}
+
 void Hermite::Update() {
-	if (points.size() > 1) {
+	if (this->IsReady()) {
 		last = sf::Vector2i(points.at(0)->x, points.at(0)->y);
 
 		if (tangentForEach) {
@@ -120,7 +144,7 @@ void Hermite::Update() {
 		}
 		else {
 			for (double i = 0; i < 1; i += 0.0001) {
-				this->Interpolate(i, points, &point);
+				this->Interpolate(i, &point);
 
 				sf::Vertex line[] =
 				{
@@ -136,7 +160,7 @@ void Hermite::Update() {
 	}
 }
 
-void Hermite::Interpolate(double time, std::vector<Point*> points, sf::Vector2i* result)
+void Hermite::Interpolate(double time, sf::Vector2i* result)
 {
 	int n = points.size();
 	int dimensions = 2;
@@ -187,16 +211,16 @@ void Hermite::PairInterpolate(double time, Point* pointA, Point* pointB, sf::Vec
 	int n = 2;
 	int dimensions = 2;
 
-	time = time * (n - 1);
+	time = time * (n - 1.0);
 	double i0 = (int) time | 0;
-	double i1 = i0 + 1;
+	double i1 = i0 + 1.0;
 
-	if (i0 > n - 1) {
+	if (i0 > n - 1.0) {
 		perror("Out of bound!\n");
 		exit(1);
 	}
 
-	if (i0 == n - 1) {
+	if (i0 == n - 1.0) {
 		i1 = i0;
 	}
 
@@ -205,13 +229,13 @@ void Hermite::PairInterpolate(double time, Point* pointA, Point* pointB, sf::Vec
 	time = (time - i0) / scale;
 
 	double t2 = time * time;
-	double it = 1 - time;
+	double it = 1.0 - time;
 	double it2 = it * it;
-	double tt = 2 * time;
+	double tt = 2.0 * time;
 
-	double h00 = (1 + tt) * it2;
+	double h00 = (1.0 + tt) * it2;
 	double h10 = time * it2;
-	double h01 = t2 * (3 - tt);
+	double h01 = t2 * (3.0 - tt);
 	double h11 = t2 * (time - 1);
 
 	result->x = h00 * pointA->x +

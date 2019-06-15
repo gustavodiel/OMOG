@@ -2,9 +2,9 @@
 
 
 
-Point::Point(int x, int y) : Entity(x, y)
+Point::Point(double x, double y) : Entity(x, y)
 {
-	this->radius = 25;
+	this->radius = 20;
 
 	this->ptrTangent = new Tangent(x, y - 100);
 	this->ptrTangentSecondary = new Tangent(x, y + 100);
@@ -19,9 +19,9 @@ Point::~Point()
 {
 }
 
-void Point::MoveTo(int x, int y) {
-	int diffX = x - this->x;
-	int diffY = y - this->y;
+void Point::MoveTo(double x, double y) {
+	double diffX = x - this->x;
+	double diffY = y - this->y;
 
 	this->ptrTangent->Move(diffX, diffY);
 	this->ptrTangentSecondary->Move(diffX, diffY);
@@ -29,7 +29,7 @@ void Point::MoveTo(int x, int y) {
 	Entity::MoveTo(x, y);
 }
 
-void Point::Move(int dX, int dY) {
+void Point::Move(double dX, double dY) {
 	this->ptrTangent->Move(dX, dY);
 	this->ptrTangentSecondary->Move(dX, dY);
 
