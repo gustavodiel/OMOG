@@ -20,6 +20,12 @@ void NURBS::Draw() {
 			point->Draw();
 		}
 	}
+
+	if (lines.size() < 1) {
+		return;
+	}
+
+	ShapesManager::getInstance()->ptrWindow->draw(lines.data(), lines.size(), sf::LinesStrip);
 }
 
 void NURBS::SetTarget(Point* point, double time)
@@ -120,6 +126,8 @@ bool NURBS::IsReady()
 }
 
 void NURBS::Update() {
+	lines.clear();
+
 	if (this->IsReady()) {
 		last = sf::Vector2i(points.at(0)->x, points.at(0)->y);
 
@@ -128,15 +136,10 @@ void NURBS::Update() {
 
 			this->Interpolate(i, &point);
 
-			sf::Vertex line[] =
-			{
-				sf::Vertex(sf::Vector2f(last.x, last.y)),
-				sf::Vertex(sf::Vector2f(point.x, point.y))
-			};
+			lines.push_back(sf::Vertex(sf::Vector2f(last.x, last.y)));
+			lines.push_back(sf::Vertex(sf::Vector2f(point.x, point.y)));
 
 			last = point;
-
-			ShapesManager::getInstance()->ptrWindow->draw(line, 2, sf::Lines);
 		}
 		
 		if (target != NULL) {

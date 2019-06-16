@@ -8,6 +8,8 @@ class NURBS {
 private:
 	sf::Vector2i last;
 
+	std::vector<sf::Vertex> lines;
+
 	std::vector<NURBPoint*> points;
 
 	NURBPoint* lastCreatedPoint;

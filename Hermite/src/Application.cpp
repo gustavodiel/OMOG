@@ -5,11 +5,13 @@
 #include "../include/Application.hpp"
 #include "../include/Hermite.h"
 
+#include "../include/ThreadPool.hpp"
+
 Application::Application(MAP_TYPE _x, MAP_TYPE _y) :
     windowX(_x), windowY(_y) { }
 
 void Application::Start() {
-    this->ptrWindow = new sf::RenderWindow(sf::VideoMode(windowX, windowY), "OMOG - Trabalho 1 - Hermite - Gustavo Diel");
+    this->ptrWindow = new sf::RenderWindow(sf::VideoMode(windowX, windowY), "OMOG - Trabalho Final - Hermite e Nurbs - Gustavo Diel");
 
     //this->ptrWindow->setFramerateLimit(10);
 
@@ -46,6 +48,10 @@ void Application::Start() {
 		pressEnterToJoin.setFillColor(sf::Color::White);
 		pressEnterToJoin.setPosition(this->windowX - 202, 44);
 	}
+	std::future<void> hermiteThread;
+	std::future<void> nurbsThread;
+
+	ThreadPool::thread_pool pool(2);
 
     while (this->ptrWindow->isOpen())
     {
@@ -63,10 +69,13 @@ void Application::Start() {
 
 		this->ptrWindow->clear();
 
-		this->hermite->Update();
-		this->hermite->Draw();
+		hermiteThread = pool.push([this](int) { this->hermite->Update(); });
+		nurbsThread = pool.push([this](int) { this->nurbs->Update(); });
+		
+		hermiteThread.wait();
+		nurbsThread.wait();
 
-		this->nurbs->Update();
+		this->hermite->Draw();
 		this->nurbs->Draw();
 
 		this->ptrWindow->draw(text);

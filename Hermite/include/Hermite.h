@@ -10,6 +10,8 @@ private:
 	sf::Vector2i last;
 	sf::Vector2i point;
 
+	std::vector<sf::Vertex> lines;
+
 	bool tangentForEach = false;
 
 	std::vector<Point*> points;

@@ -23,6 +23,12 @@ void Hermite::Draw() {
 			point->Draw();
 		}
 	}
+
+	if (lines.size() < 1) {
+		return;
+	}
+
+	ShapesManager::getInstance()->ptrWindow->draw(lines.data(), lines.size(), sf::LinesStrip);
 }
 
 bool Hermite::OnRightMouseClicked(sf::Vector2i position)
@@ -119,6 +125,7 @@ bool Hermite::IsReady()
 }
 
 void Hermite::Update() {
+	lines.clear();
 	if (this->IsReady()) {
 		last = sf::Vector2i(points.at(0)->x, points.at(0)->y);
 
@@ -130,15 +137,10 @@ void Hermite::Update() {
 
 					this->PairInterpolate(i, pointA, pointB, pointA->NormalizedTangent(), pointB->NormalizedTangentSecondary(), &point);
 
-					sf::Vertex line[] =
-					{
-						sf::Vertex(sf::Vector2f(last.x, last.y)),
-						sf::Vertex(sf::Vector2f(point.x, point.y))
-					};
-
 					last = point;
 
-					ShapesManager::getInstance()->ptrWindow->draw(line, 2, sf::Lines);
+					lines.push_back(sf::Vertex(sf::Vector2f(last.x, last.y)));
+					lines.push_back(sf::Vertex(sf::Vector2f(point.x, point.y)));
 				}
 			}
 		}
@@ -146,15 +148,15 @@ void Hermite::Update() {
 			for (double i = 0; i < 1; i += 0.0001) {
 				this->Interpolate(i, &point);
 
-				sf::Vertex line[] =
-				{
-					sf::Vertex(sf::Vector2f(last.x, last.y)),
-					sf::Vertex(sf::Vector2f(point.x, point.y))
-				};
+				//sf::Vertex line[] =
+				//{
+				//	sf::Vertex(sf::Vector2f(last.x, last.y)),
+				//	sf::Vertex(sf::Vector2f(point.x, point.y))
+				//};
 
 				last = point;
-
-				ShapesManager::getInstance()->ptrWindow->draw(line, 2, sf::Lines);
+				lines.push_back(sf::Vertex(sf::Vector2f(last.x, last.y)));
+				lines.push_back(sf::Vertex(sf::Vector2f(point.x, point.y)));
 			}
 		}
 	}
