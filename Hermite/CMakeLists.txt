@@ -16,4 +16,4 @@ add_executable(Hermite src/main.cpp src/Application.cpp src/Hermite.cpp src/Poin
 
 set(Hermite "-O2")
 
-target_link_libraries(Hermite sfml-graphics sfml-window sfml-system)
+target_link_libraries(Hermite sfml-graphics sfml-window sfml-system pthread)

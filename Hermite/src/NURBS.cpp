@@ -131,7 +131,7 @@ void NURBS::Update() {
 	if (this->IsReady()) {
 		last = sf::Vector2i(points.at(0)->x, points.at(0)->y);
 
-		for (double i = 0; i < 1; i += 0.001) {
+		for (double i = 0; i < 1; i += 0.0001) {
 			sf::Vector2i point;
 
 			this->Interpolate(i, &point);
@@ -141,11 +141,11 @@ void NURBS::Update() {
 
 			last = point;
 		}
-		
+
 		if (target != NULL) {
 			auto firstPoint = this->points.at(0);
 			auto secondPoint = this->points.at(1);
-			
+
 			if (firstPoint->Distance(this->target->x, this->target->y) > 10)
 				firstPoint->Move(velX, velY);
 			else {
@@ -163,11 +163,9 @@ void NURBS::Update() {
 
 int binomialCoeff(int n, int k)
 {
-	// Base Cases  
 	if (k == 0 || k == n)
 		return 1;
 
-	// Recur  
 	return binomialCoeff(n - 1, k - 1) +
 		binomialCoeff(n - 1, k);
 }

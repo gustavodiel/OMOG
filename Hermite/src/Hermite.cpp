@@ -148,12 +148,6 @@ void Hermite::Update() {
 			for (double i = 0; i < 1; i += 0.0001) {
 				this->Interpolate(i, &point);
 
-				//sf::Vertex line[] =
-				//{
-				//	sf::Vertex(sf::Vector2f(last.x, last.y)),
-				//	sf::Vertex(sf::Vector2f(point.x, point.y))
-				//};
-
 				last = point;
 				lines.push_back(sf::Vertex(sf::Vector2f(last.x, last.y)));
 				lines.push_back(sf::Vertex(sf::Vector2f(point.x, point.y)));

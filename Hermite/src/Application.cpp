@@ -51,19 +51,20 @@ void Application::Start() {
 	std::future<void> hermiteThread;
 	std::future<void> nurbsThread;
 
-	ThreadPool::thread_pool pool(2);
+	ThreadPool::thread_pool pool(3);
 
-    while (this->ptrWindow->isOpen())
-    {
-        sf::Event event;
+	while (this->ptrWindow->isOpen())
+	{
+		sf::Event event;
+
 		while (this->ptrWindow->pollEvent(event))
 		{
 			if (event.type == sf::Event::Closed)
 				this->ptrWindow->close();
 		}
 
-		float ElapsedTime = clock.getElapsedTime().asSeconds();
-		clock.restart();
+		// float ElapsedTime = clock.getElapsedTime().asSeconds();
+		// clock.restart();
 
 		HandleInput();
 
@@ -71,7 +72,7 @@ void Application::Start() {
 
 		hermiteThread = pool.push([this](int) { this->hermite->Update(); });
 		nurbsThread = pool.push([this](int) { this->nurbs->Update(); });
-		
+
 		hermiteThread.wait();
 		nurbsThread.wait();
 
@@ -85,7 +86,7 @@ void Application::Start() {
 
 		this->ptrWindow->display();
 
-		printf("Frame took %5lfs\n", ElapsedTime);
+		// printf("Frame took %5lfs\n", ElapsedTime);
   }
 }
 
