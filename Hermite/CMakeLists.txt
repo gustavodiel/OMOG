@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.0)
 
 project(Hermite)
 
+set(default_build_type "Release")
+
 set(CMAKE_CXX_STANDARD 17)
 
 # If you want to link SFML statically
@@ -17,3 +19,5 @@ add_executable(Hermite src/main.cpp src/Application.cpp src/Hermite.cpp src/Poin
 set(Hermite "-O2")
 
 target_link_libraries(Hermite sfml-graphics sfml-window sfml-system pthread)
+
+configure_file(${CMAKE_SOURCE_DIR}/arial.ttf ${CMAKE_CURRENT_BINARY_DIR}/arial.ttf COPYONLY)
