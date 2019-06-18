@@ -5,4 +5,5 @@ cmake-build-release/
 cmake-build-relwithdebinfo/
 build/
 build_linux/
+linux/
 **/.vscode/
